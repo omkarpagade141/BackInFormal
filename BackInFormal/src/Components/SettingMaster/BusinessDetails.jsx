@@ -125,7 +125,7 @@ const BusinessDetails = ({ settings, fetchSettings }) => {
       }
 
       const response = await axios.put(
-        'http://localhost:8080/settings/update-setting',
+        '/apiClient/settings/update-setting',
         formdata,
         {
           headers: {

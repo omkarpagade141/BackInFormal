@@ -24,7 +24,7 @@ function EditInvoice({ setNavTitle }) {
     const fetchInvoice = async (invoiceId) => {
       try {
         const response = await axios.get(
-          `http://localhost:8080/api/invoice/${invoiceId}`
+          `/apiClient/api/invoice/${invoiceId}`
         );
         if (response.status === 200) {
           setInvoice(response.data);
@@ -78,7 +78,7 @@ function EditInvoice({ setNavTitle }) {
       });
 
       const response = await axios.put(
-        `http://localhost:8080/api/invoice/${invoiceId}`,
+        `/apiClient/api/invoice/${invoiceId}`,
         {
           customer: customer,
           subTotal: totals.subTotal.toFixed(2),
