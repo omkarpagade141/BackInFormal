@@ -73,7 +73,7 @@ const Invoice = ({ billedForData, rows, stats, settings }) => {
           <img
             src={
               settings
-                ? `http://localhost:8080/api/business-logo?businessLogo=${settings.settingMaster.logoImage}`
+                ? `/apiClient/api/business-logo?businessLogo=${settings.settingMaster.logoImage}`
                 : logo
             }
             alt="Company Logo"

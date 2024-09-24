@@ -108,7 +108,7 @@ function NavigationBar({ navTitle, setNavTitle, settings }) {
           <img
             src={
               settings
-                ? `http://localhost:8080/api/business-logo?businessLogo=${settings.settingMaster.logoImage}`
+                ? `/apiClient/api/business-logo?businessLogo=${settings.settingMaster.logoImage}`
                 : logo
             }
             style={{ borderRadius: '999px' }}

@@ -50,7 +50,7 @@ function CreateInvoice({ settings }) {
 
   const fetchAllCompanies = async () => {
     const response = await axios.get(
-      'http://localhost:8080/api/customer/all-customers'
+      '/apiClient/api/customer/all-customers'
     );
     if (response.status == 200) {
       setCompanys(response.data);
@@ -187,7 +187,7 @@ function CreateInvoice({ settings }) {
     try {
       if (customer == null) {
         const custResponse = await axios.post(
-          'http://localhost:8080/api/customer/add-customer',
+          '/apiClient/api/customer/add-customer',
           {
             custName: compName,
             custMobile: phone,
@@ -218,7 +218,7 @@ function CreateInvoice({ settings }) {
       console.log('initiallization............');
 
       const invoiceResponse = await axios.post(
-        'http://localhost:8080/api/invoice/add-invoice',
+        '/apiClient/api/invoice/add-invoice',
         {
           customer: customer,
           subTotal: stats.subTotal,
@@ -554,8 +554,8 @@ function CreateInvoice({ settings }) {
             <Row>
               <Col xs={6}>
                 <Col xs={12}>
-                  <InputGroup className="mb-3">
-                    <InputGroup.Text>
+                  <InputGroup className="mb-3"  >
+                    <InputGroup.Text >
                       {' '}
                       <strong>Sub Total</strong>{' '}
                     </InputGroup.Text>

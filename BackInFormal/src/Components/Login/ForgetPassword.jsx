@@ -21,7 +21,7 @@ const ForgetPassword = () => {
     try {
       if (newPassword === confirmPassword) {
         const response = await axios.post(
-          `http://localhost:8080/users/forget-password`,
+          `/apiClient/users/forget-password`,
           {
             email: email,
             oldPassword: oldPassword,

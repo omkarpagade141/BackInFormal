@@ -24,7 +24,7 @@ function App() {
   const [settings, setSettings] = useState(null);
 
   const fetchSettings = async () => {
-    const response = await axios.get('http://localhost:8080/api/bankDetails/1');
+    const response = await axios.get('/apiClient/api/bankDetails/1');
     setSettings(response.data);
     console.log(response.data);
   };
@@ -67,7 +67,8 @@ function App() {
           pauseOnFocusLoss
           draggable
           pauseOnHover
-        />{' '}
+        />
+        {' '}
         {/* Add ToastContainer here */}
       </Router>
     </AuthProvider>
