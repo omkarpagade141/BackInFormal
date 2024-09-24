@@ -7,5 +7,5 @@ http://localhost:8090/users/new-user
 
 SETTING-MASTER
 Post
-http://localhost:8080/settings/new-setting
+/apiClient/settings/new-setting
 

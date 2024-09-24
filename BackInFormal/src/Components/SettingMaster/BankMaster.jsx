@@ -85,7 +85,7 @@ const Bank_details = ({ settings, fetchSettings }) => {
 
     try {
       const response = await axios.put(
-        'http://localhost:8080/api/bankDetails/update-bank/1',
+        '/apiClient/api/bankDetails/update-bank/1',
         {
           bankName,
           accountHolderName,

@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Table, Row, Col, Form, Pagination } from 'react-bootstrap';
 import printIcon from '../../assets/printIcon.png';
 import editIcon from '../../assets/editIcon.png';
-import deleteIcon from '../../assets/DeleteIcon.png';
+import deleteIcon from '../../assets/deleteIcon.png'; // Import deleteIcon
 import axios from 'axios';
 import './invoicelist.css';
 import printHelp from './PrintInvoice';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom'; 
 import { toast } from 'react-toastify';
 
 function ListInvoice({ settings }) {
@@ -16,19 +16,17 @@ function ListInvoice({ settings }) {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
-  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const [itemsPerPage, setItemsPerPage] = useState(5);
 
-  const navigate = useNavigate(); // Initialize useNavigate
+  
+
+  const navigate = useNavigate(); 
   const fetchInvoices = async () => {
     try {
-      const response = await axios.get(
-        'http://localhost:8080/api/invoice/invoice-list'
-      );
+      const response = await axios.get('/apiClient/api/invoice/invoice-list');
       setInvoiceList(response.data);
       setFilteredInvoiceList(response.data);
-      console.log(response.data);
     } catch (error) {
       console.error('Error fetching invoices:', error);
     }
@@ -53,27 +51,21 @@ function ListInvoice({ settings }) {
   const filterInvoices = () => {
     let filtered = invoiceList;
 
-    // Filter by search term
     if (searchTerm) {
       filtered = filtered.filter(
         (invoice) =>
           invoice.custName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          invoice.uniqueInvoiceNumber
-            .toLowerCase()
-            .includes(searchTerm.toLowerCase())
+          invoice.uniqueInvoiceNumber.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
-    // Filter by date range
     if (startDate || endDate) {
       const start = new Date(startDate);
       const end = new Date(endDate);
       filtered = filtered.filter((invoice) => {
         const invoiceDate = new Date(invoice.createdOn);
-        return (
-          (!startDate || invoiceDate >= start) &&
-          (!endDate || invoiceDate <= end)
-        );
+        return (!startDate || invoiceDate >= start) &&
+               (!endDate || invoiceDate <= end);
       });
     }
 
@@ -81,13 +73,11 @@ function ListInvoice({ settings }) {
   };
 
   const handleDeleteInvoiceById = async (id) => {
-    const confirmed = confirm(`Delete invoice permenenntly..`);
+    const confirmed = window.confirm(`Delete invoice permanently?`);
     if (confirmed) {
       try {
-        const response = await axios.delete(
-          `http://localhost:8080/api/invoice/${id}`
-        );
-        if (response.status == 200) {
+        const response = await axios.delete(`/apiClient/api/invoice/${id}`);
+        if (response.status === 200) {
           fetchInvoices();
           toast.success(`Invoice deleted successfully`);
         }
@@ -98,11 +88,8 @@ function ListInvoice({ settings }) {
   };
 
   const handlePrintInvoice = async (invoiceId) => {
-    const response = await axios.get(
-      `http://localhost:8080/api/invoice/${invoiceId}`
-    );
+    const response = await axios.get(`/apiClient/api/invoice/${invoiceId}`);
     const invoice = response.data;
-    console.log(invoice);
 
     const billedForData = {
       companyName: invoice.customer.custName,
@@ -129,15 +116,10 @@ function ListInvoice({ settings }) {
     );
   };
 
-  // Calculate the index of the first and last item on the current page
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredInvoiceList.slice(
-    indexOfFirstItem,
-    indexOfLastItem
-  );
+  const currentItems = filteredInvoiceList.slice(indexOfFirstItem, indexOfLastItem);
 
-  // Handle page change
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
@@ -155,18 +137,57 @@ function ListInvoice({ settings }) {
     0
   );
 
-  // Calculate the total number of pages
   const totalPages = Math.ceil(filteredInvoiceList.length / itemsPerPage);
 
-  const handleEditInvoice = (invoiceId) => {
-    navigate(`/dashboard/editinvoice/${invoiceId}`); // Navigate to EditInvoice with the invoiceId
-  };
+  const paginationItems = [];
+  const maxPagesToShow = 5;
+  const startPage = Math.max(1, currentPage - Math.floor(maxPagesToShow / 2));
+  const endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+
+  if (totalPages > 1) {
+    if (startPage > 1) {
+      paginationItems.push(
+        <Pagination.Ellipsis key="start-ellipsis" />
+      );
+    }
+
+    for (let page = startPage; page <= endPage; page++) {
+      paginationItems.push(
+        <Pagination.Item
+          key={page}
+          active={page === currentPage}
+          onClick={() => handlePageChange(page)}
+        >
+          {page}
+        </Pagination.Item>
+      );
+    }
+
+    if (endPage < totalPages) {
+      paginationItems.push(
+        <Pagination.Ellipsis key="end-ellipsis" />
+      );
+    }
+  }
 
   return (
     <div className="mainDivForListInvicePage">
       <div className="filterSection">
         <Row className="mb-3">
-          <Col xs={2}></Col>
+          <Col xs={1}></Col>
+          <Col xs={1}>
+            <Form.Group controlId="exampleForm.SelectCustom" style={{ width: '70px' }}>
+              <Form.Control as="select" onChange={(e)=>setItemsPerPage(e.target.value)} >
+                <option value="">Rows</option>
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={30}>30</option>
+                <option value={40}>40</option>
+                <option value={50}>50</option>
+              </Form.Control>
+            </Form.Group>
+          </Col>
           <Col xs={4}>
             <Form.Control
               type="text"
@@ -192,15 +213,38 @@ function ListInvoice({ settings }) {
             />
           </Col>
         </Row>
+        <Row>
+          <Col xs={12}>
+            <Table bordered hover responsive>
+              <thead>
+                <tr style={{ textAlign: 'center' }}>
+                  <th>Total Invoices</th>
+                  <th>Total Amount</th>
+                  <th>Received Amount</th>
+                  <th>Due Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style={{ textAlign: 'center' }}>
+                  <td><strong>{filteredInvoiceList.length}</strong></td>
+                  <td style={{ color: 'blue' }}> <strong> {totalAmt.toFixed(2)}</strong></td>
+                  <td style={{ color: 'green' }}><strong>{receivedAmt.toFixed(2)}</strong></td>
+                  <td style={{ color: 'red' }}><strong>{amtUnpaid.toFixed(2)}</strong></td>
+                </tr>
+              </tbody>
+            </Table>
+          </Col>
+        </Row>
       </div>
+
       {filteredInvoiceList.length > 0 ? (
-        <div className="listInvoiceDiv">
+        <div className="listInvoiceDiv" style={{height:'50vh'}}>
           <Table bordered hover responsive className="tableOfInvoiceItem">
-            <thead>
+            <thead >
               <tr>
                 <th style={{ width: '10%' }}>Invoice Id</th>
                 <th style={{ width: '20%' }}>Customer Name</th>
-                <th style={{ width: '15%',textAlign:'center' }}>Date(MM-DD-YYYY)</th>
+                <th style={{ width: '15%', textAlign: 'center' }}>Date(MM-DD-YYYY)</th>
                 <th style={{ width: '10%' }}>Total</th>
                 <th style={{ width: '12%' }}>Received Amount</th>
                 <th style={{ width: '10%' }}>Due Amount</th>
@@ -214,7 +258,7 @@ function ListInvoice({ settings }) {
                 <tr key={data.uniqueInvoiceNumber}>
                   <td>{data.uniqueInvoiceNumber}</td>
                   <td>{data.custName}</td>
-                  <td style={{textAlign:'center'}}>{formatDate(data.createdOn)}</td>
+                  <td style={{ textAlign: 'center' }}>{formatDate(data.createdOn)}</td>
                   <td>{data.netTotal.toFixed(2)}</td>
                   <td>{data.amtReceived.toFixed(2)}</td>
                   <td>{data.amtUnpaid.toFixed(2)}</td>
@@ -225,11 +269,7 @@ function ListInvoice({ settings }) {
                     <img
                       src={printIcon}
                       alt="Print"
-                      style={{
-                        width: '20px',
-                        marginRight: '10px',
-                        cursor: 'pointer',
-                      }}
+                      style={{ width: '20px', marginRight: '10px', cursor: 'pointer' }}
                     />
                   </td>
                   <td
@@ -239,11 +279,7 @@ function ListInvoice({ settings }) {
                     <img
                       src={editIcon}
                       alt="Edit"
-                      style={{
-                        width: '20px',
-                        marginRight: '10px',
-                        cursor: 'pointer',
-                      }}
+                      style={{ width: '20px', marginRight: '10px', cursor: 'pointer' }}
                     />
                   </td>
                   <td
@@ -255,11 +291,7 @@ function ListInvoice({ settings }) {
                     <img
                       src={deleteIcon}
                       alt="Delete"
-                      style={{
-                        width: '20px',
-                        marginRight: '10px',
-                        cursor: 'pointer',
-                      }}
+                      style={{ width: '20px', marginRight: '10px', cursor: 'pointer' }}
                     />
                   </td>
                 </tr>
@@ -267,8 +299,8 @@ function ListInvoice({ settings }) {
             </tbody>
           </Table>
           <Row>
-            <Col xs={10}></Col>
-            <Col xs={2}>
+            <Col xs={9}></Col>
+            <Col xs={3}>
               <Pagination>
                 <Pagination.Prev
                   onClick={() =>
@@ -276,20 +308,10 @@ function ListInvoice({ settings }) {
                   }
                   disabled={currentPage === 1}
                 />
-                {[...Array(totalPages)].map((_, index) => (
-                  <Pagination.Item
-                    key={index + 1}
-                    active={index + 1 === currentPage}
-                    onClick={() => handlePageChange(index + 1)}
-                  >
-                    {index + 1}
-                  </Pagination.Item>
-                ))}
+                {paginationItems}
                 <Pagination.Next
                   onClick={() =>
-                    setCurrentPage((prevPage) =>
-                      Math.min(prevPage + 1, totalPages)
-                    )
+                    setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages))
                   }
                   disabled={currentPage === totalPages}
                 />
@@ -300,28 +322,6 @@ function ListInvoice({ settings }) {
       ) : (
         <h3>No Invoices Found</h3>
       )}
-      <Row>
-        <Col xs={12}>
-          <Table bordered hover responsive>
-            <thead>
-              <tr style={{ textAlign: 'center' }}>
-                <th>Total Invoices</th>
-                <th>Total Amount</th>
-                <th>Received Amount</th>
-                <th>Due Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr style={{ textAlign: 'center' }}>
-                <td>{filteredInvoiceList.length}</td>
-                <td style={{color:'blue'}}>{totalAmt.toFixed(2)}</td>
-                <td style={{color:'green'}}>{receivedAmt.toFixed(2)}</td>
-                <td style={{color:'red'}}>{amtUnpaid.toFixed(2)}</td>
-              </tr>
-            </tbody>
-          </Table>
-        </Col>
-      </Row>
     </div>
   );
 }
