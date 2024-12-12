@@ -6,7 +6,7 @@ import { AuthProvider, useAuth } from './Components/Contexts/AuthContext';
 import {
   Navigate,
   Route,
-  BrowserRouter as Router,
+  BrowserRouter as Router, 
   Routes,
 } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
