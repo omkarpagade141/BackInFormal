@@ -1,5 +1,6 @@
 package com.backinformal.BackInFormal_Backend.service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
@@ -64,6 +65,21 @@ public class UserService {
 	}
 
 	public ResponseEntity<String> userLogIn(LoginRequest loginRequest) {
+		if(userMasterRepository.findAll().size()==0) {
+			UserMaster regUser =new UserMaster();
+			regUser.setUserName("admin123");
+			regUser.setEmail("omkarpagade141@gmail.com");
+			regUser.setPassword(passwordEncoder.encode("admin123"));
+			regUser.setRoles("ROLE_ADMIN");
+			
+			UserMaster save = userMasterRepository.save(regUser);
+			return ResponseEntity.ok("User Log in Successfully");
+			
+			
+	        
+			
+		}
+		
 		System.out.println("User name " + loginRequest.getUserName());
 		UserMaster user = userMasterRepository.findByUserName(loginRequest.getUserName()).orElseThrow(()-> new UserNotFoundException("User Not found"));
 		System.out.println("After user exist " + user.getUserName());
